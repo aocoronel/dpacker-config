@@ -17,16 +17,14 @@ struct list_pkgver_cb {
 DPacker_Pkg_List config_native_packages = { 0 };
 DPacker_Pkg_List config_user_packages = { 0 };
 
-const char *TEMPLATE_UNSUPPORTED = "user provided packages is currently unsupported. "
-                                   "I still have to study how to differentiate user "
-                                   "provided packages from native packages in Void Linux";
-
 int foreach_dict(struct xbps_handle *xhp,
                  xbps_object_t obj,
                  const char *key,
                  void *arg,
                  bool *loop_done) {
-    const char *pkgname = NULL, *state_str = NULL;
+    (void)xhp, (void)key, (void)arg, (void)loop_done;
+
+    const char *pkgname = NULL;
     pkg_state_t state;
     uint64_t instsize;
     size_t i = 0;
@@ -53,12 +51,12 @@ int foreach_dict(struct xbps_handle *xhp,
         PACKAGE_METADATA.manual += 1;
     }
 
-	const char *repository = NULL;
+    const char *repository = NULL;
 
-	xbps_dictionary_get_cstring_nocopy(obj, "repository", &repository);
-	if (!repository) {
-		exit(1);
-	}
+    xbps_dictionary_get_cstring_nocopy(obj, "repository", &repository);
+    if (!repository) {
+        exit(1);
+    }
 
     found = false;
     if (repository[0] == '/') { // User
@@ -103,11 +101,17 @@ const char *dpacker_xbps_init(void) {
         DPACKER.to_remove.initial_command += 1;
     }
 
-    da_append(&DPACKER.installed_user, "notify-send");
-	DPACKER.installed_user.initial_command += 1;
-    // da_append(&p->installed_user, "makepkg");
-    // da_append(&p->installed_user, "-si");
-    // da_append(&p->installed_user, "--dir");
+    if (VOID_CONFIG.xbps_src_root) {
+        da_append(&DPACKER.installed_user, "dpacker-xbps-src");
+        da_append(&DPACKER.installed_user, VOID_CONFIG.xbps_src_root);
+        da_append(&DPACKER.installed_user, VOID_CONFIG.user);
+
+        DPACKER.installed_user.initial_command += 3;
+    } else {
+        da_append(&DPACKER.installed_user, "notify-send");
+        da_append(&DPACKER.installed_user, "VOID_CONFIG not set");
+        DPACKER.installed_user.initial_command += 1;
+    }
 
     da_append(&DPACKER.installed_native, "xbps-install");
     DPACKER.installed_native.initial_command += 1;
@@ -148,11 +152,13 @@ static const char *dpacker_xbps_collect(char **native, char **user) {
 
     if (user) {
         for (i = 0; user[i]; i++) {
+            if (strcmp("0", user[i]) == 0) continue;
             dpacker_split_string_into_da(&config_user_packages, user[i]);
         }
     }
 
     for (i = 0; native[i]; i++) {
+        if (strcmp("0", native[i]) == 0) continue;
         dpacker_split_string_into_da(&config_native_packages, native[i]);
     }
 
@@ -164,54 +170,54 @@ static const char *dpacker_xbps_collect(char **native, char **user) {
     if (xbps_pkgdb_lock(&xh) != 0) return "failed to lock database";
     rv = xbps_pkgdb_foreach_cb(&xh, foreach_dict, &lpc);
 
-        const char *pkg;
-        for (i = 0; i < config_user_packages.count; i++) {
-            pkg = config_user_packages.data[i];
-            dpacker_assert(pkg);
+    const char *pkg;
+    for (i = 0; i < config_user_packages.count; i++) {
+        pkg = config_user_packages.data[i];
+        dpacker_assert(pkg);
 
-            xbps_dictionary_t dic = xbps_pkgdb_get_pkg(&xh, pkg);
-            // Assume that an invalid dictionary is never installed in the system
-            if (!dic) {
-                da_append(&DPACKER.installed_user, pkg);
-                continue;
-            }
-
-            bool dependency = false;
-            xbps_dictionary_get_bool(dic, "automatic-install", &dependency);
-
-            if (dependency) {
-                xbps_dictionary_set_bool(dic, "automatic-install", false);
-                continue;
-            }
-
-			// size_t pkg_len = strlen(pkg);
-			// char *path = (char *)malloc(pkg_len + 256 + 1); // + 1 NULL
-			// snprintf(path, pkg_len + 256, "./xbps-src/%s", pkg);
-			// da_append(&DPACKER.installed_user, path);
-			//
-			// free(path);
-			// continue;
+        xbps_dictionary_t dic = xbps_pkgdb_get_pkg(&xh, pkg);
+        // Assume that an invalid dictionary is never installed in the system
+        if (!dic) {
+            da_append(&DPACKER.installed_user, pkg);
+            continue;
         }
 
-        for (i = 0; i < config_native_packages.count; i++) {
-            pkg = config_native_packages.data[i];
-            dpacker_assert(pkg);
+        bool dependency = false;
+        xbps_dictionary_get_bool(dic, "automatic-install", &dependency);
 
-            xbps_dictionary_t dic = xbps_pkgdb_get_pkg(&xh, pkg);
-            // Assume that an invalid dictionary is never installed in the system
-            if (!dic) {
-                da_append(&DPACKER.installed_native, pkg);
-                continue;
-            }
-
-            bool dependency = false;
-            xbps_dictionary_get_bool(dic, "automatic-install", &dependency);
-
-            if (dependency) {
-                xbps_dictionary_set_bool(dic, "automatic-install", false);
-                continue;
-            }
+        if (dependency) {
+            xbps_dictionary_set_bool(dic, "automatic-install", false);
+            continue;
         }
+
+        // size_t pkg_len = strlen(pkg);
+        // char *path = (char *)malloc(pkg_len + 256 + 1); // + 1 NULL
+        // snprintf(path, pkg_len + 256, "./xbps-src/%s", pkg);
+        // da_append(&DPACKER.installed_user, path);
+        //
+        // free(path);
+        // continue;
+    }
+
+    for (i = 0; i < config_native_packages.count; i++) {
+        pkg = config_native_packages.data[i];
+        dpacker_assert(pkg);
+
+        xbps_dictionary_t dic = xbps_pkgdb_get_pkg(&xh, pkg);
+        // Assume that an invalid dictionary is never installed in the system
+        if (!dic) {
+            da_append(&DPACKER.installed_native, pkg);
+            continue;
+        }
+
+        bool dependency = false;
+        xbps_dictionary_get_bool(dic, "automatic-install", &dependency);
+
+        if (dependency) {
+            xbps_dictionary_set_bool(dic, "automatic-install", false);
+            continue;
+        }
+    }
 
     if (user) {
         da_free(&config_user_packages);

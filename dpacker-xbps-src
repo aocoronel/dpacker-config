@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+ROOT=$1
+shift
+
+for package in $@; do
+    $ROOT/xbps-src $package
+done
