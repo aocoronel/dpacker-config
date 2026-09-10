@@ -4,5 +4,5 @@ ROOT=$1
 shift
 
 for package in $@; do
-    $ROOT/xbps-src $package
+    $ROOT/xbps-src pkg $package && sudo xbps-install -R $ROOT/hostdir/binpkgs $package
 done
