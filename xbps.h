@@ -8,12 +8,6 @@
 #include <sys/types.h>
 #include <xbps.h>
 
-struct list_pkgver_cb {
-    unsigned int pkgver_len;
-    unsigned int maxcols;
-    char *linebuf;
-};
-
 DPacker_Pkg_List config_native_packages = { 0 };
 DPacker_Pkg_List config_user_packages = { 0 };
 
@@ -28,7 +22,7 @@ int foreach_dict(struct xbps_handle *xhp,
     pkg_state_t state;
     uint64_t instsize;
     size_t i = 0;
-    bool found;
+    bool found = false;
 
     xbps_dictionary_get_cstring_nocopy(obj, "pkgname", &pkgname);
     xbps_dictionary_get_uint64(obj, "installed_size", &instsize);
@@ -58,7 +52,8 @@ int foreach_dict(struct xbps_handle *xhp,
         exit(1);
     }
 
-    found = false;
+    // Same as alpm version, user provided code gotta be vendored and built locally
+    // This way it's more reliable to check rather the repository is a filepath or an URL
     if (repository[0] == '/') { // User
         for (i = 0; i < config_user_packages.count; i++) {
             const char *pkg = config_user_packages.data[i];
@@ -104,9 +99,8 @@ const char *dpacker_xbps_init(void) {
     if (VOID_CONFIG.xbps_src_root) {
         da_append(&DPACKER.installed_user, "dpacker-xbps-src");
         da_append(&DPACKER.installed_user, VOID_CONFIG.xbps_src_root);
-        da_append(&DPACKER.installed_user, VOID_CONFIG.user);
 
-        DPACKER.installed_user.initial_command += 3;
+        DPACKER.installed_user.initial_command += 2;
     } else {
         da_append(&DPACKER.installed_user, "notify-send");
         da_append(&DPACKER.installed_user, "VOID_CONFIG not set");
@@ -134,21 +128,17 @@ const char *dpacker_xbps_init(void) {
 static const char *dpacker_xbps_collect(char **native, char **user) {
     dpacker_assert_nonnull(native);
 
-    int rv = 0;
-    struct list_pkgver_cb lpc;
-    struct xbps_handle xh;
-    const char *rootdir = NULL, *cachedir = NULL, *confdir = NULL;
     size_t i = 0;
+    int rv = 0;
+    struct xbps_handle xh = { 0 };
+    char *pkg;
 
-    memset(&xh, 0, sizeof(xh));
+#define prepare_change_cmd(pkg) cmd_change_mode[4] = pkg
+    char *cmd_change_mode[6] = { DPACKER_CONFIG.sudo, "xbps-pkgdb", "-m", "manual", NULL, NULL };
 
-    lpc.maxcols = 0;
-    lpc.linebuf = NULL;
-
-    // TODO: currently always NULL
-    if (rootdir) xbps_strlcpy(xh.rootdir, rootdir, sizeof(xh.rootdir));
-    if (cachedir) xbps_strlcpy(xh.cachedir, cachedir, sizeof(xh.cachedir));
-    if (confdir) xbps_strlcpy(xh.confdir, confdir, sizeof(xh.confdir));
+    if (VOID_CONFIG.rootdir) xbps_strlcpy(xh.rootdir, VOID_CONFIG.rootdir, sizeof(xh.rootdir));
+    if (VOID_CONFIG.cachedir) xbps_strlcpy(xh.cachedir, VOID_CONFIG.cachedir, sizeof(xh.cachedir));
+    if (VOID_CONFIG.confdir) xbps_strlcpy(xh.confdir, VOID_CONFIG.confdir, sizeof(xh.confdir));
 
     if (user) {
         for (i = 0; user[i]; i++) {
@@ -167,10 +157,8 @@ static const char *dpacker_xbps_collect(char **native, char **user) {
         exit(1);
     }
 
-    if (xbps_pkgdb_lock(&xh) != 0) return "failed to lock database";
-    rv = xbps_pkgdb_foreach_cb(&xh, foreach_dict, &lpc);
+    rv = xbps_pkgdb_foreach_cb(&xh, foreach_dict, NULL);
 
-    const char *pkg;
     for (i = 0; i < config_user_packages.count; i++) {
         pkg = config_user_packages.data[i];
         dpacker_assert(pkg);
@@ -186,17 +174,10 @@ static const char *dpacker_xbps_collect(char **native, char **user) {
         xbps_dictionary_get_bool(dic, "automatic-install", &dependency);
 
         if (dependency) {
-            xbps_dictionary_set_bool(dic, "automatic-install", false);
+            prepare_change_cmd(pkg);
+            dpacker_sh(cmd_change_mode);
             continue;
         }
-
-        // size_t pkg_len = strlen(pkg);
-        // char *path = (char *)malloc(pkg_len + 256 + 1); // + 1 NULL
-        // snprintf(path, pkg_len + 256, "./xbps-src/%s", pkg);
-        // da_append(&DPACKER.installed_user, path);
-        //
-        // free(path);
-        // continue;
     }
 
     for (i = 0; i < config_native_packages.count; i++) {
@@ -214,7 +195,8 @@ static const char *dpacker_xbps_collect(char **native, char **user) {
         xbps_dictionary_get_bool(dic, "automatic-install", &dependency);
 
         if (dependency) {
-            xbps_dictionary_set_bool(dic, "automatic-install", false);
+            prepare_change_cmd(pkg);
+            dpacker_sh(cmd_change_mode);
             continue;
         }
     }
@@ -225,8 +207,6 @@ static const char *dpacker_xbps_collect(char **native, char **user) {
 
     da_free(&config_native_packages);
 
-    if (rv == 0) xbps_pkgdb_update(&xh, true, false);
-    xbps_pkgdb_unlock(&xh);
     xbps_end(&xh);
 
     return rv == 0 ? NULL : strerror(rv);

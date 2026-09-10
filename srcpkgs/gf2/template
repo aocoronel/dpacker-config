@@ -1,0 +1,26 @@
+pkgname=gf2
+version=20260915
+_commit=1c04ed95d45d49fb4b06cbc620c61acd58818977
+revision=1
+depends="gdb freetype libX11 python3"
+short_desc="A GDB frontend for Linux"
+hostmakedepends="unzip git libXft-devel xorg-server-devel ${depends}"
+license="MIT"
+maintainer="Augusto Coronel <aocoronel@proton.me>"
+homepage="https://github.com/nakst/gf"
+
+do_fetch() {
+	git clone https://github.com/nakst/gf.git --checkout "${_commit}"
+}
+
+pre_build() {
+	cp "extensions_v5/extensions.cpp" .
+}
+
+do_build() {
+	./build.sh
+}
+
+do_install() {
+    vbin gf2 usr/bin/gf2
+}

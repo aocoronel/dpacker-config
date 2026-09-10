@@ -71,7 +71,7 @@ char *native[] = {
 		"libxbps-devel",
         "bash zsh", // bash-completion
         "ledger",
-        "isync mu",
+        "isync mu4e",
         "github-cli",
         "hunspell-pt_BR hunspell-en",
         "curl ImageMagick openssh openssl sqlite ueberzug", // jq
@@ -118,7 +118,7 @@ char *native[] = {
 #ifdef DESKTOP_MODE
         "fuse",
         "i3",
-        "i3status",        
+        "i3status",
         "cairo-devel",
         "emacs-gtk3",
 		"dunst",
@@ -150,13 +150,13 @@ char *native[] = {
             "xsel xclip xdotool",
 
             "xwallpaper zenity dconf dmenu redshift sxhkd", // picom conky
-            "ksnip",
+            "flameshot",
             // "obs-studio",
         )
 
         steam(
            "gamemode steam",
-        ),        
+        ),
 #endif
 
 #ifdef PROGRAMMER_MODE
@@ -177,29 +177,29 @@ char *native[] = {
         rust     ("rust rust-analyzer"),
         shell    ("shfmt"), // shellcheck
         zig      ("zig zls"),
-#endif // PROGRAMMER_MODE        
+#endif // PROGRAMMER_MODE
         NULL,
 };
 // clang-format on
 
 // clang-format off
 char *void_packages[] = {
-       "ttf-jetbrains-mono-nerd",
-       "anydesk",
-       "opendoas",
-	   "st",
-       // "gf2-git",
-       // "brave-origin",
-       // odin("odin-git ols-git odinfmt"),
-       // x11("zoomer"),       
-       NULL,
+    "ttf-jetbrains-mono-nerd",
+    "gf2",
+    // Void Linux packages
+    "anydesk",
+    "opendoas",
+    "st",
+    // "brave-origin",
+    // odin("odin-git ols-git odinfmt"),
+    // x11("zoomer"),
+    NULL,
 };
 // clang-format on
 
 int main(int argc, char **argv) {
     DPacker_Interface interface;
     VOID_CONFIG.xbps_src_root = "/home/aoc/void-packages";
-    VOID_CONFIG.user = "aoc";
 
     interface.init = dpacker_xbps_init;
     interface.collect = dpacker_xbps_collect;

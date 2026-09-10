@@ -1,0 +1,21 @@
+# Template file for 'ttf-jetbrains-mono-nerd'
+pkgname=ttf-jetbrains-mono-nerd
+version=3.5.1
+revision=1
+hostmakedepends="unzip"
+depends="font-util"
+short_desc="JetbrainsMono NerdUbuntu font family"
+maintainer="Augusto Coronel <aocoronel@proton.me>"
+license="custom:SIL"
+homepage="https://www.nerdfonts.com/"
+distfiles="https://github.com/ryanoasis/nerd-fonts/releases/download/v${version}/JetBrainsMono.zip"
+checksum=fab782a66f7d3019da64f6572db9fc5d3a4bcb19f9fa13e2d8a62e3693d6396e
+font_dirs="/usr/share/fonts/TTF"
+provides="font:sans-serif-0_1 font:monospace-0_1"
+
+do_install() {
+	vmkdir usr/share/fonts/TTF
+	install -m644 JetBrainsMonoNerdFont-{L,R,B}*.ttf ${DESTDIR}/usr/share/fonts/TTF
+	install -m644 JetBrainsMonoNerdFont-*.ttf ${DESTDIR}/usr/share/fonts/TTF
+	vlicense OFL.txt
+}
