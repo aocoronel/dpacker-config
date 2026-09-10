@@ -99,8 +99,9 @@ const char *dpacker_xbps_init(void) {
     if (VOID_CONFIG.xbps_src_root) {
         da_append(&DPACKER.installed_user, "dpacker-xbps-src");
         da_append(&DPACKER.installed_user, VOID_CONFIG.xbps_src_root);
+        da_append(&DPACKER.installed_user, DPACKER_CONFIG.sudo);
 
-        DPACKER.installed_user.initial_command += 2;
+        DPACKER.installed_user.initial_command += 3;
     } else {
         da_append(&DPACKER.installed_user, "notify-send");
         da_append(&DPACKER.installed_user, "VOID_CONFIG not set");
