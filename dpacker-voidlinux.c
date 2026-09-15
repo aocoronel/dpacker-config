@@ -190,6 +190,8 @@ char *void_packages[] = {
     "anydesk",
     "opendoas",
     "st",
+	// "odin",
+    "tinypass",
     // "brave-origin",
     // odin("odin-git ols-git odinfmt"),
     // x11("zoomer"),

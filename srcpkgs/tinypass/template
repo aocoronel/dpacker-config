@@ -1,0 +1,21 @@
+pkgname=tinypass
+version=0.1.0
+revision=1
+depends="openssl"
+short_desc="public domain statless password manager"
+hostmakedepends="gcc wget openssl openssl-devel"
+license="CC0"
+maintainer="Augusto Coronel <aocoronel@proton.me>"
+homepage="https://aocoronel.github.io/tinypass/index.html"
+
+do_fetch() {
+    wget "https://aocoronel.github.io/tinypass/tinypass.c" -O "$pkgname-$version/tinypass.c"
+}
+
+do_build() {
+    gcc $CFLAGS tinypass.c -o tinypass -lcrypto
+}
+
+do_install() {
+    vbin tinypass usr/bin/tinypass
+}
