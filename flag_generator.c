@@ -8,7 +8,7 @@
 #include <stdbool.h>
 
 #define FLAG_NAME "flags.h"
-#define PACMIRROR_FILE "pacmirror.c"
+#define PACMIRROR_FILE "dpacker.c"
 
 #define ARRAY_LEN(a) sizeof((a)) / sizeof((a[0]))
 #define STRLEN(s) ARRAY_LEN(("" s "")) - sizeof((s)[0])

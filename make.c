@@ -203,6 +203,11 @@ void compile_all(void) {
 
 int main(void) {
     compile("flag_generator.c");
+
+    char *flag_generator[] = { "./flag_generator", NULL };
+    if (run(flag_generator) != 0) return 1;
+
     compile("dpacker.c");
+
     return 0;
 }
