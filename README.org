@@ -11,7 +11,23 @@ This repository is a personal configuration. The actual development of ~dpacker~
 
 ** How does it work?
 
-~dpacker~ uses ~libalpm~, which is the ~pacman~ database library. It compares all packages defined in ~dpacker.c~ with the packages installed in the system. Then it installs missing packages from system repos and AUR (using a PKGBUILDs in ~./pkg~), and uninstalls packages not in the list.
+~dpacker~ uses ~libalpm~ or ~libxbps~, which is the ~pacman~ and ~xbps~ database library, respectively. It compares all packages defined in ~dpacker.c~ with the packages installed in the system. Then it installs missing packages from system repos and user packages (using a PKGBUILDs in ~./pkg~, or void-packages in ~./srcpkgs~), and uninstalls packages not in the list.
+
+** Using this configuration as a base
+
+*** AUR
+
+Just adding a PKGBUILD in ~./pkg~ and adding to the ~aur~ list is enough, than just run ~./dpacker~.
+
+Currently it doesn't upgrade packages, so it must be done manually.
+
+*** Void Packages
+
+Clone the ~void-packages~ somewhere, and modify this line to point to where it lives. Then hardlink all the packages from ~./srcpkgs~ to ~void-packages/srcpkgs~.
+
+#+BEGIN_SRC c
+  VOID_CONFIG.xbps_src_root = "/path/to/void-packages";
+#+END_SRC
 
 ** License
 
