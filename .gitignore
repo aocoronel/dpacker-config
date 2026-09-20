@@ -1,6 +1,8 @@
 flag_generator
 flags.h
-pacmirror
+dpacker
+make
+dpacker.c
 pkg/*/src
 pkg/*/pkg
 pkg/*/.*
