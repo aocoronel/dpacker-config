@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define FLAG_NAME "flags.h"
+#define FLAG_NAME "./config/flags.h"
 
 #define ARRAY_LEN(a) sizeof((a)) / sizeof((a[0]))
 #define STRLEN(s) ARRAY_LEN(("" s "")) - sizeof((s)[0])

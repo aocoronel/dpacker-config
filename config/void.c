@@ -8,6 +8,9 @@
 This configuration has only been tested on Void Linux.
 */
 
+#define NONFREE
+#define TELEMETRY
+
 // === Processor ===
 // #define AMD
 // #define NVIDIA
@@ -55,145 +58,190 @@ This configuration has only been tested on Void Linux.
 
 // clang-format off
 char *native[] = {
-        "base-devel base-system linux linux-firmware-broadcom",
-        "grub grub-x86_64-efi",
-        amd("linux-firmware-amdgpu lvulkan-radeon linux-firmware-radeon"), // not checked
-        nvidia("linux-firmware-nvidia"),
-        intel(
-              "linux-firmware-intel",
-              "mesa-vulkan-intel",
-              "intel-gmmlib intel-ucode",
-              "intel-media-driver",
-              "void-repo-nonfree"
-        ),
-		"libxbps-devel",
-        "bash zsh", // bash-completion
-        "ledger",
-        "isync mu4e",
-        "github-cli",
-        "hunspell-pt_BR hunspell-en",
-        "curl ImageMagick openssh openssl sqlite ueberzug", // jq
-        "dbus",
-        "efibootmgr",
-        "elogind",
-        "git gnupg less",
-        "libgccjit",
-        "libotf",
-        "libtool",
-        "libvorbis",
-        "m17n-lib",
-        "make",
-        "man-pages",
-        "mpv",
-        "neovim",
-        "ntp",
-        "openresolv",
-        "openssh",
-        "openssl",
-        "pass pass-otp zbar",
-        "pkgconf",
-        "poppler-devel",
-        "poppler-glib-devel",
-        "restic rsync",
-        "sqlite",
-        "sxhkd",
-        "tar gzip zip unzip",
-        "ufw",
-        "pandoc",
-        "rofi",
-        "wireguard-tools",
-        "turnstile",
-        "wget",
-        "which",
-        "wpa_supplicant",
-        "xclip",
-        "xfsprogs",
-        "xdg-utils xdg-desktop-portal",
-        "ffmpeg sox",
-        "pinentry-tty",
-        "zoxide fzf direnv", // btop
-        "mesa",
-        "poppler-utils poppler",
+    nonfree("void-repo-nonfree"),
+
+    // Base system
+    "base-devel base-system",
+    // Kernel
+    "linux linux-firmware-broadcom",
+    // Bootloader
+    "grub grub-x86_64-efi efibootmgr",
+    "mesa",
+    // Filesystem
+    "xfsprogs",
+
+    // Processors
+    amd("linux-firmware-amd mesa-vulkan-radeon"),
+    nvidia(nonfree("linux-firmware-nvidia mesa-vulkan-nouveau")),
+    intel(
+        "linux-firmware-intel mesa-vulkan-intel intel-gmmlib intel-media-driver",
+        nonfree("intel-ucode")
+    ),
+
+    // Shell
+    "bash zsh", // bash-completion
+    "less tree grep tar zip unzip gzip which curl wget",
+    "zoxide fzf direnv", // btop
+
+    // Accounting
+    "ledger",
+
+    // Mail
+    "isync mu4e",
+
+    // Encryption, signing
+    "gnupg pinentry-tty",
+    "openssl",
+
+    // Services
+    "ntp",
+    "ufw",
+    "wireguard-tools openresolv",
+    "openssh",
+
+    // Multimedia
+    "mpv ImageMagick poppler-utils poppler",
+    "ffmpeg sox",
+
+    // Passwords
+    "pass pass-otp zbar",
+
+    // Backup
+    "restic rsync",
+
+    // Wi-Fi
+    "wpa_supplicant",
+
+    // Document converter
+    "pandoc",
+
+    // File Manager
+    // "ranger ueberzug",
+
+    // Downloader
+    "yt-dlp python3-mutagen",
+
 #ifdef DESKTOP_MODE
-        "fuse",
-        "i3",
-        "i3status",
-        "cairo-devel",
-        "emacs-gtk3",
-		"dunst",
-        "gimp",
-        "ttf-ubuntu-font-family noto-fonts-emoji",
-        "pipewire pulseaudio wireplumber",
-        "alsa-utils",
-        "adwaita-icon-theme adwaita-icon-theme",
-        "yt-dlp python3-mutagen",
-        "zathura zathura-pdf-mupdf",
-        // "libreoffice-still hunspell",
-        // "pcmanfm tumbler ffmpegthumbnailer",
-        // "polkit udiskie udisks2",
-        // "qutebrowser",
-        // "shotcut sox",
-        // "tenacity",
-        // "thunderbird",
-        // "wine",
+    // Services
+    "turnstile",
+    "dbus",
+    "elogind",
+	"dunst",
+    "pipewire pulseaudio wireplumber alsa-utils",
 
-        virtual_machine("bridge-utils dnsmasq dosfstools libvirt lxc qemu-full swtpm virt-manager virt-viewer"),
+    // XDG
+    "xdg-utils xdg-desktop-portal",
 
-        wayland(
-            "fuzzel pavucontrol swaybg cliphist xdg-user-dirs ydotool foot",
-            // "grim satty slurp wf-recorder",
-            "cpio gsettings-desktop-schemas libva-utils lm_sensors wl-clipboard wlr-randr",
-        ),
+    // Menu
+    "rofi",
 
-        x11("xorg libXft-devel xorg-server xorg-server-common xorg-server-xnest xorg-server-xvfb xorg-server-devel",
-            "xsel xclip xdotool",
+    // Bindings
+    // "sxhkd",
 
-            "xwallpaper zenity dconf dmenu redshift sxhkd", // picom conky
-            "flameshot",
-            // "obs-studio",
-        )
+    // AppImages
+    "fuse",
 
-        steam(
-           "gamemode steam",
-        ),
+    // Text Editor
+    "emacs-gtk3",
+    "hunspell-pt_BR hunspell-en", // Spellchecker for Emacs
+
+    // Multimedia
+    "gimp",
+    // "shotcut",
+    // "tenacity",
+
+    // Fonts
+    "ttf-ubuntu-font-family noto-fonts-emoji",
+
+    // Icon & Theme
+    "adwaita-icon-theme adwaita-icon-theme",
+
+    // PDF
+    "zathura zathura-pdf-mupdf",
+
+    // Windows
+    // "wine",
+
+    virtual_machine("bridge-utils dnsmasq dosfstools libvirt lxc qemu-full swtpm virt-manager virt-viewer"),
+
+    wayland(
+        "fuzzel pavucontrol swaybg xdg-user-dirs ydotool foot",
+        // "grim satty slurp wf-recorder",
+        "cpio gsettings-desktop-schemas libva-utils lm_sensors wl-clipboard wlr-randr",
+        // wl-copy wl-paste cliphist
+    ),
+
+    x11(
+        "xorg libXft-devel xorg-server xorg-server-common xorg-server-xnest xorg-server-xvfb xorg-server-devel",
+        "xsel xclip xdotool",
+
+        "xwallpaper zenity dconf dmenu redshift sxhkd", // picom conky
+        "flameshot",
+        "xclip",
+        "i3 i3status",
+        // "obs-studio",
+    )
+
+    nonfree(steam(
+       "gamemode steam",
+    )),
 #endif
 
 #ifdef PROGRAMMER_MODE
-        c        ("clang clang-tools-extra gcc gdb libtool make mold valgrind tcc"), // meson cmake ninja lldb
-        c3       ("c3c"),
-        d        ("dmd dfmt"),
-        elixir   ("elixir"),
-        erlang   ("erlang"),
-        go       ("go"),
-        haskell  ("ghc"),
-        java     ("openjdk"),
-        js       ("nodejs npm"),
-        kotlin   ("kotlin"),
-        lua      ("StyLua"),
-        ocaml    ("ocaml"),
-        python   ("python imath pystring python3-BeautifulSoup4 python3-six"),
-        ruby     ("ruby"),
-        rust     ("rust rust-analyzer"),
-        shell    ("shfmt"), // shellcheck
-        zig      ("zig zls"),
+    // Development
+	"libxbps-devel", // for dpacker.h
+    telemetry("github-cli"),
+    "git",
+    "pkgconf",
+    "libgccjit",
+    "libotf",
+    "libtool",
+    "libvorbis",
+    "m17n-lib",
+    "make",
+    "man-pages",
+    "sqlite",
+    "cairo-devel",
+
+    // Languages
+    c        ("clang clang-tools-extra gcc gdb libtool make mold valgrind tcc"), // meson cmake ninja lldb
+    c3       ("c3c"),
+    d        ("dmd dfmt"),
+    elixir   ("elixir"),
+    erlang   ("erlang"),
+    go       ("go"),
+    haskell  ("ghc"),
+    java     ("openjdk"),
+    js       ("nodejs npm"),
+    kotlin   ("kotlin"),
+    lua      ("StyLua"),
+    ocaml    ("ocaml"),
+    python   ("python imath pystring python3-BeautifulSoup4 python3-six"),
+    ruby     ("ruby"),
+    rust     ("rust rust-analyzer"),
+    shell    ("shfmt"), // shellcheck
+    zig      ("zig zls"),
 #endif // PROGRAMMER_MODE
-        NULL,
+    NULL,
 };
 // clang-format on
 
 // clang-format off
 char *void_packages[] = {
+    // == my ports
     "ttf-jetbrains-mono-nerd",
     "gf2",
-    // Void Linux packages
-    "anydesk",
-    "opendoas",
-    "st",
-	// "odin",
     "tinypass",
+
+	// "odin",
     // "brave-origin",
     // odin("odin-git ols-git odinfmt"),
     // x11("zoomer"),
+
+    // == void-packages
+    "anydesk",
+    "opendoas",
+    "st",
     NULL,
 };
 // clang-format on
