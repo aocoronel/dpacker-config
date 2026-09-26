@@ -1,5 +1,4 @@
-// bin: -Wall -Wextra
-
+#include "dpacker.h"
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -8,21 +7,25 @@
 #include <stdbool.h>
 
 #define FLAG_NAME "flags.h"
-#define PACMIRROR_FILE "dpacker.c"
 
 #define ARRAY_LEN(a) sizeof((a)) / sizeof((a[0]))
 #define STRLEN(s) ARRAY_LEN(("" s "")) - sizeof((s)[0])
 
-int main(void) {
+int main(int argc, char **argv) {
+    assert(argc > 1 && "usage: FILE");
+
     char c = 0;
 
-    const char *file = PACMIRROR_FILE;
+    const char *file = argv[1];
 
     FILE *output = fopen(FLAG_NAME, "w");
     assert(output && "failed to open file: " FLAG_NAME);
 
     FILE *fp = fopen(file, "r");
-    assert(fp && "failed to open file: " PACMIRROR_FILE);
+    if (!fp) {
+        eprintf("failed to open file: %s\n", argv[1]);
+        return 1;
+    }
 
     char *buff = malloc(sizeof(char) * 1024);
     assert(buff && "out of memory");

@@ -3,9 +3,7 @@ This repository is a personal configuration. The actual development of ~dpacker~
 ** How to use
 
 #+BEGIN_SRC bash
-  ln -s config/void.c dpacker.c // Void
-  ln -s config/artix.c dpacker.c // Artix
-  cc @build && ./make
+  ./make $distro # void,artix
   ./dpacker
 #+END_SRC
 

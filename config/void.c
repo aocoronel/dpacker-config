@@ -1,5 +1,3 @@
-// bin: -Wall -Wextra -lxbps
-
 /*
  ____  ____            _
 |  _ \|  _ \ __ _  ___| | _____ _ __
@@ -113,8 +111,9 @@ char *native[] = {
         "xdg-utils xdg-desktop-portal",
         "ffmpeg sox",
         "pinentry-tty",
-        "zoxide btop fzf direnv",
+        "zoxide fzf direnv", // btop
         "mesa",
+        "poppler-utils poppler",
 #ifdef DESKTOP_MODE
         "fuse",
         "i3",

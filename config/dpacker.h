@@ -175,7 +175,7 @@ static bool dpacker_parse_args(int argc, char **argv) {
     return true;
 }
 
-static void dpacker_split_string_into_da(DPacker_Pkg_List *da, const char *str) {
+void dpacker_split_string_into_da(DPacker_Pkg_List *da, const char *str) {
     dpacker_assert_nonnull(da);
     dpacker_assert_nonnull(str);
     char *copy, *token;

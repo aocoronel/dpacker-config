@@ -1,5 +1,3 @@
-// bin: -Wall -Wextra -lalpm -DARCH -DMULTILIB -DARTIX
-
 /*
  ____  ____            _
 |  _ \|  _ \ __ _  ___| | _____ _ __
