@@ -19,11 +19,8 @@ This configuration has only been tested on Void Linux.
 
 // === Display ===
 #define X11
-// #define WAYLAND
 
 // === SOFTWARE ===
-#define ANYDESK
-#define EMACS
 // #define STEAM
 // #define VIRTUAL_MACHINE
 
@@ -81,7 +78,7 @@ char *native[] = {
     // Shell
     "bash zsh", // bash-completion
     "less tree grep tar zip unzip gzip which curl wget",
-    "zoxide fzf direnv", // btop
+    "zoxide fzf direnv",
 
     // Accounting
     "ledger",
@@ -135,15 +132,12 @@ char *native[] = {
     // Menu
     "rofi",
 
-    // Bindings
-    // "sxhkd",
-
     // AppImages
     "fuse",
 
     // Text Editor
     "emacs-gtk3",
-    "hunspell-pt_BR hunspell-en", // Spellchecker for Emacs
+    "hunspell hunspell-pt_BR hunspell-en", // Spellchecker for Emacs
 
     // Multimedia
     "gimp",
@@ -159,27 +153,41 @@ char *native[] = {
     // PDF
     "zathura zathura-pdf-mupdf",
 
+    // Screenshooter
+    "flameshot",
+
+    // Screen recorder
+    // "obs-studio",
+
     // Windows
     // "wine",
 
     virtual_machine("bridge-utils dnsmasq dosfstools libvirt lxc qemu-full swtpm virt-manager virt-viewer"),
 
-    wayland(
-        "fuzzel pavucontrol swaybg xdg-user-dirs ydotool foot",
-        // "grim satty slurp wf-recorder",
-        "cpio gsettings-desktop-schemas libva-utils lm_sensors wl-clipboard wlr-randr",
-        // wl-copy wl-paste cliphist
-    ),
-
     x11(
-        "xorg libXft-devel xorg-server xorg-server-common xorg-server-xnest xorg-server-xvfb xorg-server-devel",
-        "xsel xclip xdotool",
+        "xorg xorg-server xorg-server-common xorg-server-xnest xorg-server-xvfb xorg-server-devel",
+        "xdotool",
 
-        "xwallpaper zenity dconf dmenu redshift sxhkd", // picom conky
-        "flameshot",
-        "xclip",
+        // DWM
+        // "libXft-devel",
+
+        // Clipboard
+        "xsel xclip",
+
+        // Wallpaper
+        "xwallpaper",
+
+        // Picker
+        "zenity",
+
+        // Bindings
+        // "sxhkd",
+
+        // Blue filter
+        "redshift",
+
+        // WM
         "i3 i3status",
-        // "obs-studio",
     )
 
     nonfree(steam(
@@ -202,9 +210,10 @@ char *native[] = {
     "man-pages",
     "sqlite",
     "cairo-devel",
+    "valgrind",
 
     // Languages
-    c        ("clang clang-tools-extra gcc gdb libtool make mold valgrind tcc"), // meson cmake ninja lldb
+    c        ("clang clang-tools-extra gcc gdb libtool make mold tcc"), // meson cmake ninja lldb
     c3       ("c3c"),
     d        ("dmd dfmt"),
     elixir   ("elixir"),
@@ -216,6 +225,7 @@ char *native[] = {
     kotlin   ("kotlin"),
     lua      ("StyLua"),
     ocaml    ("ocaml"),
+    odin     ("mold"),
     python   ("python imath pystring python3-BeautifulSoup4 python3-six"),
     ruby     ("ruby"),
     rust     ("rust rust-analyzer"),
@@ -233,13 +243,12 @@ char *void_packages[] = {
     "gf2",
     "tinypass",
 
-	// "odin",
     // "brave-origin",
-    // odin("odin-git ols-git odinfmt"),
+    // odin("odin ols odinfmt"),
     // x11("zoomer"),
 
     // == void-packages
-    "anydesk",
+    nonfree("anydesk"),
     "opendoas",
     "st",
     NULL,
